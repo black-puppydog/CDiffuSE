@@ -17,19 +17,19 @@ import numpy as np
 
 
 class AttrDict(dict):
-  def __init__(self, *args, **kwargs):
-      super(AttrDict, self).__init__(*args, **kwargs)
-      self.__dict__ = self
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
 
-  def override(self, attrs):
-    if isinstance(attrs, dict):
-      self.__dict__.update(**attrs)
-    elif isinstance(attrs, (list, tuple, set)):
-      for attr in attrs:
-        self.override(attr)
-    elif attrs is not None:
-      raise NotImplementedError
-    return self
+    def override(self, attrs):
+        if isinstance(attrs, dict):
+            self.__dict__.update(**attrs)
+        elif isinstance(attrs, (list, tuple, set)):
+            for attr in attrs:
+                self.override(attr)
+        elif attrs is not None:
+            raise NotImplementedError
+        return self
 
 
 params = AttrDict(
@@ -37,17 +37,15 @@ params = AttrDict(
     batch_size=16,
     learning_rate=2e-4,
     max_grad_norm=None,
-
     # Data params
     sample_rate=16000,
-    #n_mels set to the npy size
-    n_mels=80, 
+    # n_mels set to the npy size
+    n_mels=80,
     n_specs=513,
     n_fft=1024,
     hop_samples=256,
     # frame number at once
-    crop_mel_frames=62,  
-
+    crop_mel_frames=62,
     # Model params
     residual_layers=30,
     residual_channels=64,
