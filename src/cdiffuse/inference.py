@@ -173,7 +173,6 @@ def predict(
     use_gpu,
 ):
     device = torch.device("cuda" if use_gpu else "cpu")
-    print(model)
     with torch.no_grad():
         # Expand rank 2 tensors by adding a batch dimension.
         if len(spectrogram.shape) == 2:
