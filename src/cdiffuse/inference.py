@@ -28,16 +28,15 @@ from model import DiffuSE
 
 from pathlib import Path
 from glob import glob
-from tqdm import tqdm
+from tqdm import tqdm, trange
 
 random.seed(23)
 
 models = {}
 
 
-def load_model(
-    model_dir: Path = None, args=None, params=None, device=torch.device("cpu")
-):
+def load_model(model_dir: Path = None, args=None, params=None, device=None):
+    device = device or torch.device("cuda" if args.use_gpu else "cpu")
     # Lazy load model.
     if not model_dir in models:
         if (model_dir / "weights.pt").is_file():
@@ -171,8 +170,10 @@ def predict(
     c3,
     delta,
     delta_bar,
-    device=torch.device("cpu"),
+    use_gpu,
 ):
+    device = torch.device("cuda" if use_gpu else "cpu")
+    print(model)
     with torch.no_grad():
         # Expand rank 2 tensors by adding a batch dimension.
         if len(spectrogram.shape) == 2:
@@ -184,6 +185,7 @@ def predict(
             model.params.hop_samples * spectrogram.shape[-1],
             device=device,
         )
+        print(audio.shape)
         noise_scale = torch.from_numpy(alpha_cum**0.5).float().unsqueeze(1).to(device)
         noisy_audio = torch.zeros(
             spectrogram.shape[0],
@@ -195,7 +197,7 @@ def predict(
         )
         audio = noisy_audio
         gamma = [0.2]
-        for n in range(len(alpha) - 1, -1, -1):
+        for n in trange(len(alpha) - 1, -1, -1):
             if n > 0:
                 predicted_noise = model(
                     audio, spectrogram, torch.tensor([T[n]], device=audio.device)
@@ -266,6 +268,7 @@ def main(args):
             c3,
             delta,
             delta_bar,
+            args.use_gpu,
         )
         audio = audio[:, :wlen]
         # audio = snr_process(audio,noisy_signal)
