@@ -124,7 +124,7 @@ def main(args):
         params.n_mels = 80
 
     if args.se or args.voicebank:
-        filenames = glob(f"{args.dir}/*.wav", recursive=True)
+        filenames = glob(f"{args.dir}/*.mp3", recursive=True)
     else:
         filenames = glob(f"{args.dir}/*.Clean.wav", recursive=True)
     #   filenames=sorted(filenames)
